@@ -435,7 +435,7 @@ endef
 
 #***********************************************************************
 
-.PHONY: st-util gdb picocom clean erase nm help
+.PHONY: st-util gdb picocom clean erase nm format help
 
 all: $(BIN)
 
@@ -445,6 +445,18 @@ help:
 	@echo "gdb       Start gdb"
 	@echo "picocom   Start picocom"
 	@echo "nm        Stats about size"
+	@echo "format    Format source code"
+
+format:
+	astyle -n \
+		--indent=spaces=2 \
+		--style=attach \
+		--pad-oper \
+		--pad-header \
+		--align-pointer=type \
+		--align-reference=type \
+		--add-brackets \
+		src/*
 
 nm: $(BIN)
 	-$(NM) -A -l -C -td --reverse-sort --size-sort build/main.out
