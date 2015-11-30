@@ -83,7 +83,9 @@ ifneq (,$(findstring SPI,$(FEATURES)))
 endif
 
 ifneq (,$(findstring USART,$(FEATURES)))
-	SRCS += $(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_uart.c
+	SRCS += \
+		$(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_uart.c \
+		$(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_uart_ex.c
 endif
 
 ifneq (,$(findstring IWDG,$(FEATURES)))
@@ -143,7 +145,7 @@ include $(LIBMKFILES)
 
 INCLUDES   += $(LIBINC) -I$(BUILD_DIR) -I$(LIBDIR)
 DEBUGFLAGS ?= -Og -g -gstabs+
-CFLAGS     += $(CPU) $(CMSIS_OPT) $(OTHER_OPT) $(USER_CFLAGS) -Wall -fno-common -fno-strict-aliasing $(INCLUDES) $(DEBUGFLAGS) -Wfatal-errors
+CFLAGS     += $(CPU) $(CMSIS_OPT) $(OTHER_OPT) $(USER_CFLAGS) -Wall -fno-common -fdata-sections -ffunction-sections -fno-strict-aliasing $(INCLUDES) $(DEBUGFLAGS) -Wfatal-errors
 ASFLAGS    += $(CFLAGS) -x assembler-with-cpp
 LDFLAGS    += -Wl,--gc-sections,-Map=$*.map,-cref -T $(LDSCRIPT) $(USER_LDFLAGS) $(CPU)
 ARFLAGS    += cr
