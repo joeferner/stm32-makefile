@@ -547,6 +547,7 @@ $(BUILD_DIR)/stm32cubemxgen $(BUILD_DIR)/stm32cubemx-pinout.csv: $(STM32CUBEMX_F
 	@echo "$$SRC_PATCH_CONTENTS" > $(BUILD_DIR)/src.patch
 	dos2unix $(BUILD_DIR)/Src/main.c
 	-patch -N $(BUILD_DIR)/Src/main.c < $(BUILD_DIR)/src.patch
+	sed -i -- 's/FLASH_BASE[[:space:]]*[(][(]uint32_t[)]0x08000000[)]/FLASH_BASE ((uint32_t)$(LINK_FLASH_START))/g' $(BUILD_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
 	touch $(BUILD_DIR)/stm32cubemxgen
 
 $(BUILD_DIR)/pinout-csv-to-h.sh:
