@@ -9,8 +9,9 @@ STM32CUBEMX_FILE ?= $(shell ls *.ioc)
 DEVICE           ?= $(shell cat $(STM32CUBEMX_FILE) | grep PCC.PartNumber | awk -F= '{ print $$2 }')
 FEATURES         += $(shell cat $(STM32CUBEMX_FILE) | grep Mcu\.IP[0-9]\*= | awk -F= '{ print $$2 }' | sed 's/[0-9]*$$//g')
 
-LINK_FLASH_START  ?= 0x08000000
-LINK_RAM_START    ?= 0x20000000
+LINK_FLASH_START       ?= 0x08000000
+LINK_RAM_START         ?= 0x20000000
+LINK_DATA_EEPROM_START ?= 0x08080000
 
 ifeq ($(DEVICE),STM32F051K8Tx)
 DEVICE_FAMILY     = STM32F0xx
@@ -104,6 +105,9 @@ endif
 
 ifneq (,$(findstring FLASH,$(FEATURES)))
 	SRCS += $(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_flash.c
+endif
+
+ifneq (,$(findstring FLASHEX,$(FEATURES)))
 	SRCS += $(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_flash_ex.c
 endif
 
@@ -547,7 +551,8 @@ $(BUILD_DIR)/stm32cubemxgen $(BUILD_DIR)/stm32cubemx-pinout.csv: $(STM32CUBEMX_F
 	@echo "$$SRC_PATCH_CONTENTS" > $(BUILD_DIR)/src.patch
 	dos2unix $(BUILD_DIR)/Src/main.c
 	-patch -N $(BUILD_DIR)/Src/main.c < $(BUILD_DIR)/src.patch
-	sed -i -- 's/FLASH_BASE[[:space:]]*[(][(]uint32_t[)]0x08000000[)]/FLASH_BASE ((uint32_t)$(LINK_FLASH_START))/g' $(BUILD_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
+	sed -i -- 's/FLASH_BASE[[:space:]]*[(][(]uint32_t[)]0x[0-9a-fA-F]*[)]/FLASH_BASE            ((uint32_t)$(LINK_FLASH_START))/g' $(BUILD_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
+	sed -i -- 's/DATA_EEPROM_BASE[[:space:]]*[(][(]uint32_t[)]0x[0-9a-fA-F]*[)]/DATA_EEPROM_BASE      ((uint32_t)$(LINK_DATA_EEPROM_START))/g' $(BUILD_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
 	touch $(BUILD_DIR)/stm32cubemxgen
 
 $(BUILD_DIR)/pinout-csv-to-h.sh:
