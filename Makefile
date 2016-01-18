@@ -444,13 +444,14 @@ endef
 
 #***********************************************************************
 
-.PHONY: st-util gdb picocom clean erase nm format help
+.PHONY: st-util gdb picocom clean erase write nm format help
 
 all: $(BIN)
 
 help:
 	@echo "st-util   Start st-util"
 	@echo "erase     Erase the device"
+	@echo "write     Write program to the device"
 	@echo "gdb       Start gdb"
 	@echo "picocom   Start picocom"
 	@echo "nm        Stats about size"
@@ -477,6 +478,10 @@ st-util:
 erase:
 	@echo "Use lsusb then STLINK_DEVICE=<bus>:<device id> for multiple devices"
 	st-flash erase
+
+write: $(BIN)
+	@echo "Use lsusb then STLINK_DEVICE=<bus>:<device id> for multiple devices"
+	st-flash write $(BIN) $(LINK_FLASH_START)
 
 gdb:
 	$(GDB) -tui -ex "target extended-remote localhost:4242" $(BUILD_DIR)/main.out
