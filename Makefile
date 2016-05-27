@@ -5,6 +5,7 @@ FEATURES =
 -include user.mk
 include project.mk
 
+MAKEFILE_DIR     ?= $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 STM32CUBEMX_FILE ?= $(shell ls *.ioc)
 DEVICE           ?= $(shell cat $(STM32CUBEMX_FILE) | grep PCC.PartNumber | awk -F= '{ print $$2 }')
 FEATURES         += $(shell cat $(STM32CUBEMX_FILE) | grep Mcu\.IP[0-9]\*= | awk -F= '{ print $$2 }' | sed 's/[0-9]*$$//g')
@@ -86,7 +87,6 @@ endif
 
 ifneq (,$(findstring USART,$(FEATURES)))
 	SRCS += $(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_uart.c
-	SRCS += $(BUILD_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_uart_ex.c
 endif
 
 ifneq (,$(findstring IWDG,$(FEATURES)))
@@ -137,7 +137,7 @@ OBJDUMP = $(SYSTEM)-objdump
 GDB     = $(SYSTEM)-gdb
 SIZE    = $(SYSTEM)-size
 NM      = $(SYSTEM)-nm
-STM32CUBEMX = stm32cubemx
+STM32CUBEMX = /opt/STM32CubeMX/STM32CubeMX
 
 INCLUDES =
 CFLAGS   = 
@@ -385,10 +385,10 @@ endef
 #***********************************************************************
 
 define STM32CUBEMX_SCRIPT_CONTENTS
-config load stm32cubemx.ioc
+config load $(MAKEFILE_DIR)build/stm32cubemx.ioc
 project name $(STM32CUBEMX_FILE)
 project toolchain TrueSTUDIO
-csv pinout stm32cubemx-pinout.csv
+csv pinout $(MAKEFILE_DIR)build/stm32cubemx-pinout.csv
 project generate
 exit
 endef
@@ -552,7 +552,7 @@ $(BUILD_DIR)/stm32cubemxgen $(BUILD_DIR)/stm32cubemx-pinout.csv: $(STM32CUBEMX_F
 	@mkdir -p $(BUILD_DIR)
 	@echo "$$STM32CUBEMX_SCRIPT_CONTENTS" > $(BUILD_DIR)/stm32cubemx.script
 	@cp $(STM32CUBEMX_FILE) $(BUILD_DIR)/stm32cubemx.ioc
-	cd $(BUILD_DIR); $(STM32CUBEMX) -q stm32cubemx.script
+	cd $(BUILD_DIR); $(STM32CUBEMX) -q $(MAKEFILE_DIR)build/stm32cubemx.script
 	@echo "$$SRC_PATCH_CONTENTS" > $(BUILD_DIR)/src.patch
 	dos2unix $(BUILD_DIR)/Src/main.c
 	-patch -N $(BUILD_DIR)/Src/main.c < $(BUILD_DIR)/src.patch
