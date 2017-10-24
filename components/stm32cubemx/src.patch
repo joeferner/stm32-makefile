@@ -1,0 +1,28 @@
+--- build/stm32cubemx/Src/main.c
++++ build/stm32cubemx/Src/main.c
+@@ -58,6 +58,8 @@
+ 
+ /* USER CODE BEGIN PFP */
+ /* Private function prototypes -----------------------------------------------*/
++extern void setup();
++extern void loop();
+ 
+ /* USER CODE END PFP */
+ 
+@@ -87,13 +89,14 @@
+   MX_USART1_UART_Init();
+ 
+   /* USER CODE BEGIN 2 */
+-
++  setup();
+   /* USER CODE END 2 */
+ 
+   /* Infinite loop */
+   /* USER CODE BEGIN WHILE */
+   while (1)
+   {
++    loop();
+   /* USER CODE END WHILE */
+ 
+   /* USER CODE BEGIN 3 */
+

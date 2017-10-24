@@ -1,0 +1,36 @@
+mainmenu "STM32 Makefile Configuration"
+
+menu "SDK tool configuration"
+config TOOLPREFIX
+    string "Compiler toolchain path/prefix"
+    default "arm-none-eabi-"
+    help
+        The prefix/path that is used to call the toolchain. The default setting assumes
+        a gcc setup that is in your PATH.
+endmenu
+
+source "$COMPONENT_KCONFIGS_PROJBUILD"
+
+choice OPTIMIZATION_LEVEL
+    prompt "Optimization level"
+    default OPTIMIZATION_LEVEL_DEBUG
+    help
+        This option sets optimization level.
+        
+        - for "Release" setting, -Os flag is added to CFLAGS,
+         and -DNDEBUG flag is added to CPPFLAGS.
+         
+        - for "Debug" setting, -Og flag is added to CFLAGS.
+        
+        To override any of these settings, set CFLAGS and/or CPPFLAGS
+        in project makefile, before including $(STM32_MAKEFILE_PATH)/make/project.mk.
+        
+config OPTIMIZATION_LEVEL_DEBUG
+    bool "Debug"
+config OPTIMIZATION_LEVEL_RELEASE
+    bool "Release"
+endchoice
+
+menu "Component config"
+source "$COMPONENT_KCONFIGS"
+endmenu

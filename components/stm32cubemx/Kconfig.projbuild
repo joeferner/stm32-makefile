@@ -1,0 +1,15 @@
+menu "STM32cubemx Config"
+
+config LINK_FLASH_START
+        hex "Link flash start"
+        default 0x08000000
+
+config LINK_RAM_START
+        hex "RAM start"
+        default 0x20000000
+
+config LINK_DATA_EEPROM_START
+        hex "EEPROM start"
+        default 0x08080000
+
+endmenu
