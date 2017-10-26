@@ -10,7 +10,7 @@
 # where this file is located.
 #
 
-.PHONY: build-components menuconfig defconfig all build clean all_binaries check-submodules size format
+.PHONY: build-components menuconfig defconfig all build clean all_binaries check-submodules format
 all: all_binaries
 # see below for recipe of 'all' target
 #
@@ -178,11 +178,11 @@ STM32_MAKEFILE_VER := $(shell cd ${STM32_MAKEFILE_PATH} && git describe --always
 SRCDIRS_COMPONENT_NAMES := $(sort $(foreach comp,$(SRCDIRS),$(lastword $(subst /, ,$(comp)))))
 LDFLAGS ?= -nostdlib \
 	$(addprefix -L$(BUILD_DIR_BASE)/,$(COMPONENTS) $(TEST_COMPONENT_NAMES) $(SRCDIRS_COMPONENT_NAMES) ) \
-	-u call_user_start_cpu0	\
+	-u call_user_start_cpu0 \
 	$(EXTRA_LDFLAGS) \
-	-Wl,--gc-sections	\
-	-Wl,-static	\
-	-Wl,--start-group	\
+	-Wl,--gc-sections \
+	-Wl,-static \
+	-Wl,--start-group \
 	$(COMPONENT_LDFLAGS) \
 	-lgcc \
 	-lstdc++ \
@@ -208,13 +208,15 @@ COMMON_WARNING_FLAGS = -Wall -Werror=all \
 	-Wno-error=unused-variable \
 	-Wno-error=deprecated-declarations \
 	-Wextra \
+	-Wfatal-errors \
 	-Wno-unused-parameter -Wno-sign-compare
 
 # Flags which control code generation and dependency generation, both for C and C++
 COMMON_FLAGS = \
 	-ffunction-sections -fdata-sections \
 	-fstrict-volatile-bitfields \
-	-mlongcalls \
+	-fno-strict-aliasing \
+	-fno-common \
 	-nostdlib
 
 # Optimization flags are set based on menuconfig choice
@@ -222,7 +224,7 @@ ifneq ("$(CONFIG_OPTIMIZATION_LEVEL_RELEASE)","")
 OPTIMIZATION_FLAGS = -Os
 CPPFLAGS += -DNDEBUG
 else
-OPTIMIZATION_FLAGS = -Og
+OPTIMIZATION_FLAGS = -Og -g -gstabs+
 endif
 
 # Enable generation of debugging symbols
@@ -237,6 +239,7 @@ CFLAGS := $(strip \
 	$(COMMON_FLAGS) \
 	$(COMMON_WARNING_FLAGS) -Wno-old-style-declaration \
 	$(CFLAGS) \
+	$(COMPONENT_CFLAGS) \
 	$(EXTRA_CFLAGS))
 
 # List of flags to pass to C++ compiler
@@ -250,6 +253,10 @@ CXXFLAGS := $(strip \
 	$(COMMON_WARNING_FLAGS) \
 	$(CXXFLAGS) \
 	$(EXTRA_CXXFLAGS))
+
+OBJCOPYFLAGS += -Obinary
+
+OBJDUMPFLAGS += -S
 
 export CFLAGS CPPFLAGS CXXFLAGS
 
@@ -365,20 +372,6 @@ $(foreach component,$(TEST_COMPONENT_PATHS),$(eval $(call GenerateComponentTarge
 app-clean: $(addsuffix -clean,$(notdir $(COMPONENT_PATHS_BUILDABLE)))
 	$(summary) RM $(APP_ELF)
 	rm -f $(APP_ELF) $(APP_BIN) $(APP_MAP)
-
-size: $(APP_ELF)
-	$(SIZE) $(APP_ELF)
-
-format:
-	astyle -n \
-		--indent=spaces=2 \
-		--style=attach \
-		--pad-oper \
-		--pad-header \
-		--align-pointer=type \
-		--align-reference=type \
-		--add-brackets \
-		main/*
 
 # NB: this ordering is deliberate (app-clean before config-clean),
 # so config remains valid during all component clean targets
