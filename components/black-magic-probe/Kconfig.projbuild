@@ -1,0 +1,7 @@
+menu "Black Magic Probe Config"
+
+config BMP_DEVICE
+        string "Black Magic Probe device path"
+        default /dev/ttyBMP
+
+endmenu

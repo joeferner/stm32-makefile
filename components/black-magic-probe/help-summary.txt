@@ -1,0 +1,1 @@
+make bmp-gdb     - Open GDB and attach to Black Magic Probe

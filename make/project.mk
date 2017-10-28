@@ -150,7 +150,7 @@ export COMPONENT_INCLUDES
 # Set variables common to both project & component
 include $(STM32_MAKEFILE_PATH)/make/common.mk
 
-COMPONENT_INCLUDE_MKS := $(addsuffix /component_include.mk,$(COMPONENT_PATHS_BUILDABLE))
+COMPONENT_INCLUDE_MKS := $(addsuffix /component-include.mk,$(COMPONENT_PATHS_BUILDABLE))
 -include $(COMPONENT_INCLUDE_MKS)
 
 all:
@@ -250,6 +250,7 @@ CC := $(call dequote,$(CONFIG_TOOLPREFIX))gcc
 CXX := $(call dequote,$(CONFIG_TOOLPREFIX))c++
 LD := $(call dequote,$(CONFIG_TOOLPREFIX))ld
 AR := $(call dequote,$(CONFIG_TOOLPREFIX))ar
+GDB := $(call dequote,$(CONFIG_TOOLPREFIX))gdb
 OBJCOPY := $(call dequote,$(CONFIG_TOOLPREFIX))objcopy
 OBJDUMP := $(call dequote,$(CONFIG_TOOLPREFIX))objdump
 SIZE := $(call dequote,$(CONFIG_TOOLPREFIX))size
@@ -309,7 +310,6 @@ help:
 	@echo "make erase-flash - Erase entire flash contents"
 	@echo "make st-util     - Start st-util"
 	@echo "make openocd     - Start openocd"
-	@echo "make gdb         - Start gdb"
 	@echo "make picocom     - Start picocom"
 	for f in `find $(COMPONENT_PATHS_BUILDABLE) -name help-summary.txt`; do \
 	  cat $$f; \
