@@ -19,24 +19,6 @@ all: all_binaries
 # target can build everything without triggering the per-component "to
 # flash..." output targets.)
 
-help:
-	@echo "Welcome to STM32 Makefile build system. Some useful make targets:"
-	@echo ""
-	@echo "make menuconfig  - Configure STM32 project"
-	@echo "make defconfig   - Set defaults for all new configuration options"
-	@echo ""
-	@echo "make all         - Build app (Default)"
-	@echo "make flash       - Flash app to a chip"
-	@echo "make clean       - Remove all build output"
-	@echo "make size        - Display the memory footprint of the app"
-	@echo "make format-src  - Format source code"
-	@echo "make erase-flash - Erase entire flash contents"
-	@echo "make st-util     - Start st-util"
-	@echo "make openocd     - Start openocd"
-	@echo "make gdb         - Start gdb"
-	@echo "make picocom     - Start picocom"
-	@echo ""
-
 # dependency checks
 ifndef MAKE_RESTARTS
 ifeq ("$(filter 4.% 3.81 3.82,$(MAKE_VERSION))","")
@@ -313,6 +295,25 @@ app: $(APP_BIN)
 	@echo "App built."
 
 all_binaries: $(APP_BIN)
+
+help:
+	@echo "Welcome to STM32 Makefile build system. Some useful make targets:"
+	@echo ""
+	@echo "make menuconfig  - Configure STM32 project"
+	@echo "make defconfig   - Set defaults for all new configuration options"
+	@echo ""
+	@echo "make all         - Build app (Default)"
+	@echo "make flash       - Flash app to a chip"
+	@echo "make clean       - Remove all build output"
+	@echo "make erase-flash - Erase entire flash contents"
+	@echo "make st-util     - Start st-util"
+	@echo "make openocd     - Start openocd"
+	@echo "make gdb         - Start gdb"
+	@echo "make picocom     - Start picocom"
+	for f in `find $(COMPONENT_PATHS_BUILDABLE) -name help-summary.txt`; do \
+	  cat $$f; \
+	done
+	@echo ""
 
 $(BUILD_DIR_BASE):
 	mkdir -p $(BUILD_DIR_BASE)

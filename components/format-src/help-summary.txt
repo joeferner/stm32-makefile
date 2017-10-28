@@ -1,0 +1,1 @@
+make size        - Display the memory footprint of the app
