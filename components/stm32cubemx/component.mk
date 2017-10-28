@@ -1,5 +1,4 @@
 
-COMPONENT_OWNBUILDTARGET := true
 STM32CUBEMX_GEN_DIR      := $(BUILD_DIR_BASE)/stm32cubemxgen
 STM32CUBEMX_GEN_FILE     := $(STM32CUBEMX_GEN_DIR)/stm32cubemxgen
 
@@ -114,17 +113,16 @@ ifneq (,$(findstring FLASHEX,$(FEATURES)))
 endif
 
 COMPONENT_GENERATED_SRCDIRS := \
-	component-src \
-	component-src/Drivers \
-	component-src/Drivers/$(DEVICE_FAMILY)_HAL_Driver \
-	component-src/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src \
-	component-src/Src \
-	component-src/Drivers/CMSIS \
-	component-src/Drivers/CMSIS/Device \
-	component-src/Drivers/CMSIS/Device/ST \
-	component-src/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY) \
-	component-src/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source \
-	component-src/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates \
+	Drivers \
+	Drivers/$(DEVICE_FAMILY)_HAL_Driver \
+	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src \
+	Src \
+	Drivers/CMSIS \
+	Drivers/CMSIS/Device \
+	Drivers/CMSIS/Device/ST \
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY) \
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source \
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates
 
 # general variables
 USE_FULL_ASSERT ?= -DUSE_FULL_ASSERT
@@ -149,8 +147,8 @@ $(STM32CUBEMX_GEN_FILE) $(STM32CUBEMX_GEN_DIR)/stm32cubemx-pinout.csv: $(STM32CU
 	sed -i -- 's/FLASH_BASE[[:space:]]*[(][(]uint32_t[)]0x[0-9a-fA-F]*[)]/FLASH_BASE            ((uint32_t)$(LINK_FLASH_START))/g' $(STM32CUBEMX_GEN_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
 	sed -i -- 's/DATA_EEPROM_BASE[[:space:]]*[(][(]uint32_t[)]0x[0-9a-fA-F]*[)]/DATA_EEPROM_BASE      ((uint32_t)$(LINK_DATA_EEPROM_START))/g' $(STM32CUBEMX_GEN_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include/*
 	rm -rf $(STM32CUBEMX_GEN_DIR)/component-src
-	mkdir -p $(STM32CUBEMX_GEN_DIR)/component-src
-	cd $(STM32CUBEMX_GEN_DIR) && cp --parents $(SRCS) $(STM32CUBEMX_GEN_DIR)/component-src
+	mkdir -p $(COMPONENT_BUILD_DIR)
+	cd $(STM32CUBEMX_GEN_DIR) && cp --parents $(SRCS) $(COMPONENT_BUILD_DIR)
 	touch $(STM32CUBEMX_GEN_FILE)
 
 $(STM32CUBEMX_GEN_DIR)/pinout.h: $(STM32CUBEMX_GEN_DIR)/stm32cubemx-pinout.csv
@@ -167,12 +165,4 @@ $(LDSCRIPT):
 	@mkdir -p $(STM32CUBEMX_GEN_DIR)
 	@cat $(COMPONENT_PATH)/ldscript | envsubst > $(LDSCRIPT)
 
-.PHONY: build
-build: $(COMPONENT_LIBRARY)
-
-# Build the archive. We remove the archive first, otherwise ar will get confused if we update
-# an archive when multiple filenames have the same name (src1/test.o and src2/test.o)
-$(COMPONENT_LIBRARY): $(COMPONENT_OBJS) $(COMPONENT_EMBED_OBJS) $(STM32CUBEMX_GEN_FILE) $(STM32CUBEMX_GEN_DIR)/pinout.h $(LDSCRIPT)
-	$(summary) AR $@
-	rm -f $@
-	$(AR) cru $@ $^
+COMPONENT_ADDITIONAL_REQS = $(STM32CUBEMX_GEN_FILE) $(STM32CUBEMX_GEN_DIR)/pinout.h $(LDSCRIPT)
