@@ -150,8 +150,8 @@ export COMPONENT_INCLUDES
 # Set variables common to both project & component
 include $(STM32_MAKEFILE_PATH)/make/common.mk
 
-COMPONENT_INCLUDES := $(addsuffix /component_include.mk,$(COMPONENT_PATHS_BUILDABLE))
--include $(COMPONENT_INCLUDES)
+COMPONENT_INCLUDE_MKS := $(addsuffix /component_include.mk,$(COMPONENT_PATHS_BUILDABLE))
+-include $(COMPONENT_INCLUDE_MKS)
 
 all:
 	@echo "To flash all build output, run 'make flash'"

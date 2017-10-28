@@ -1,6 +1,6 @@
 # Variables for version.h
-GIT_HASH := $(shell git rev-parse HEAD)
-GIT_TAG  := $(shell git describe --abbrev=0 --tags)
+GIT_HASH := $(shell git rev-parse HEAD 2>/dev/null)
+GIT_TAG  := $(shell git describe --abbrev=0 --tags 2>/dev/null)
 
 $(COMPONENT_BUILD_DIR)/version.h: $(COMPONENT_BUILD_DIR)/$(GIT_HASH)
 	@echo "#ifndef _VERSION_H_" > $(COMPONENT_BUILD_DIR)/version.h
