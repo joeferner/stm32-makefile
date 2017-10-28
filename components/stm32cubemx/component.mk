@@ -69,13 +69,13 @@ SRCS = \
 	Src/$(DEVICE_FAMILYL)_hal_msp.c \
 	Src/$(DEVICE_FAMILYL)_it.c \
 	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates/system_$(DEVICE_FAMILYL).c \
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates/gcc/startup_$(STARTUP_FILE).s \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal.c \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_rcc.c \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_rcc_ex.c \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_gpio.c \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_dma.c \
 	Drivers/$(DEVICE_FAMILY)_HAL_Driver/Src/$(DEVICE_FAMILYL)_hal_cortex.c
-#TODO Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates/gcc/startup_$(STARTUP_FILE).s 
 
 # Add features source files
 ifneq (,$(findstring ADC,$(FEATURES)))
@@ -122,7 +122,8 @@ COMPONENT_GENERATED_SRCDIRS := \
 	Drivers/CMSIS/Device/ST \
 	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY) \
 	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source \
-	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates \
+	Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Source/Templates/gcc
 
 # general variables
 USE_FULL_ASSERT ?= -DUSE_FULL_ASSERT
@@ -134,7 +135,7 @@ COMPONENT_ADD_CFLAGS += -I$(STM32CUBEMX_GEN_DIR)/Inc
 COMPONENT_ADD_CFLAGS += -I$(STM32CUBEMX_GEN_DIR)/Drivers/$(DEVICE_FAMILY)_HAL_Driver/Inc
 COMPONENT_ADD_CFLAGS += -I$(STM32CUBEMX_GEN_DIR)/Drivers/CMSIS/Include
 COMPONENT_ADD_CFLAGS += -I$(STM32CUBEMX_GEN_DIR)/Drivers/CMSIS/Device/ST/$(DEVICE_FAMILY)/Include
-COMPONENT_ADD_LDFLAGS = -l$(COMPONENT_NAME) $(CPU) -lm -T $(LDSCRIPT)
+COMPONENT_ADD_LDFLAGS = -l$(COMPONENT_NAME) $(CPU) -lm -specs=nano.specs -T $(LDSCRIPT)
 
 $(STM32CUBEMX_GEN_FILE) $(STM32CUBEMX_GEN_DIR)/stm32cubemx-pinout.csv: $(STM32CUBEMX_FILE)
 	@mkdir -p $(STM32CUBEMX_GEN_DIR)

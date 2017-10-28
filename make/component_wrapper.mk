@@ -80,16 +80,16 @@ include $(COMPONENT_MAKEFILE)
 ################################################################################
 
 # Object files which need to be linked into the library
-# By default we take all .c, .cpp & .S files in COMPONENT_SRCDIRS.
+# By default we take all .c, .cpp & .s files in COMPONENT_SRCDIRS.
 ifndef COMPONENT_OBJS
 # Find all source files in all COMPONENT_SRCDIRS
 COMPONENT_OBJS := $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.c,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.c)))
 COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.cpp,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.cpp)))
-COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.S,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.S)))
+COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.s,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.s)))
 # Find all generated source files in all COMPONENT_GENERATED_SRCDIRS
 COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.c,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.c)))
 COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.cpp,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.cpp)))
-COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.S,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.S)))
+COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.s,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.s)))
 # Make relative by removing COMPONENT_PATH from all found object paths
 COMPONENT_OBJS := $(patsubst $(COMPONENT_PATH)/%,%,$(COMPONENT_OBJS))
 else
@@ -198,7 +198,7 @@ $(1)/%.o: $$(COMPONENT_PATH)/$(1)/%.cpp $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE
 	$$(summary) CXX $$@
 	$$(CXX) $$(CXXFLAGS) $$(CPPFLAGS) $$(addprefix -I,$$(COMPONENT_INCLUDES)) $$(addprefix -I,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
 
-$(1)/%.o: $$(COMPONENT_PATH)/$(1)/%.S $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_SRCDIRS)
+$(1)/%.o: $$(COMPONENT_PATH)/$(1)/%.s $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_SRCDIRS)
 	$$(summary) AS $$@
 	$$(CC) $$(CPPFLAGS) $$(DEBUG_FLAGS) $$(addprefix -I ,$$(COMPONENT_INCLUDES)) $$(addprefix -I ,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
 
@@ -229,7 +229,7 @@ $(COMPONENT_BUILD_DIR)/$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.cpp $(COMMON_MAK
 	$$(summary) CXX $$@
 	$$(CXX) $$(CXXFLAGS) $$(CPPFLAGS) $$(addprefix -I,$$(COMPONENT_INCLUDES)) $$(addprefix -I,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
 
-$(COMPONENT_BUILD_DIR)/$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.S $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_GENERATED_SRCDIRS)
+$(COMPONENT_BUILD_DIR)/$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.s $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_GENERATED_SRCDIRS)
 	$$(summary) AS $$@
 	$$(CC) $$(CPPFLAGS) $$(DEBUG_FLAGS) $$(addprefix -I ,$$(COMPONENT_INCLUDES)) $$(addprefix -I ,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
 

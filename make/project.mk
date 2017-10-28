@@ -176,18 +176,11 @@ STM32_MAKEFILE_VER := $(shell cd ${STM32_MAKEFILE_PATH} && git describe --always
 
 # Set default LDFLAGS
 SRCDIRS_COMPONENT_NAMES := $(sort $(foreach comp,$(SRCDIRS),$(lastword $(subst /, ,$(comp)))))
-LDFLAGS ?= -nostdlib \
+LDFLAGS ?= \
 	$(addprefix -L$(BUILD_DIR_BASE)/,$(COMPONENTS) $(TEST_COMPONENT_NAMES) $(SRCDIRS_COMPONENT_NAMES) ) \
-	-u call_user_start_cpu0 \
 	$(EXTRA_LDFLAGS) \
 	-Wl,--gc-sections \
-	-Wl,-static \
-	-Wl,--start-group \
-	$(COMPONENT_LDFLAGS) \
-	-lgcc \
-	-lstdc++ \
-	-Wl,--end-group \
-	-Wl,-EL
+	$(COMPONENT_LDFLAGS)
 
 # Set default CPPFLAGS, CFLAGS, CXXFLAGS
 # These are exported so that components can use them when compiling.
@@ -214,10 +207,8 @@ COMMON_WARNING_FLAGS = -Wall -Werror=all \
 # Flags which control code generation and dependency generation, both for C and C++
 COMMON_FLAGS = \
 	-ffunction-sections -fdata-sections \
-	-fstrict-volatile-bitfields \
 	-fno-strict-aliasing \
-	-fno-common \
-	-nostdlib
+	-fno-common
 
 # Optimization flags are set based on menuconfig choice
 ifneq ("$(CONFIG_OPTIMIZATION_LEVEL_RELEASE)","")
@@ -377,6 +368,8 @@ app-clean: $(addsuffix -clean,$(notdir $(COMPONENT_PATHS_BUILDABLE)))
 # so config remains valid during all component clean targets
 config-clean: app-clean
 clean: config-clean
+	$(summary) RM $(BUILD_DIR_BASE)
+	rm -rf $(BUILD_DIR_BASE)
 
 # phony target to check if any git submodule listed in COMPONENT_SUBMODULES are missing
 # or out of date, and exit if so. Components can add paths to this variable.
