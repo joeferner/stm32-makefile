@@ -53,6 +53,14 @@ $(error Unhandled device $(DEVICE))
 endif
 export DEVICE_FAMILY DEVICE_TYPE CPU RAM FLASH
 
+define COMPONENT_ADDITIONAL_VARS
+DEVICE_FAMILY = $(DEVICE_FAMILY)
+DEVICE_TYPE = $(DEVICE_TYPE)
+CPU = $(CPU)
+RAM = $(RAM)
+FLASH = $(FLASH)
+endef
+
 STARTUP_FILE   ?= $(shell echo $(DEVICE_TYPE) | tr A-Z a-z)
 DEVICE_FAMILYL = $(shell echo $(DEVICE_FAMILY) | tr A-Z a-z)
 LDSCRIPT       = $(STM32CUBEMX_GEN_DIR)/FLASH.ld

@@ -143,6 +143,8 @@ endef
 # component-specific feature, please don't! What you want is a
 # Makefile.projbuild for your component (see docs/build-system.rst for
 # more.)
+export COMPONENT_ADDITIONAL_VARS
+
 component_project_vars.mk::
 	$(details) "Building component project variables list $(abspath $@)"
 	@echo '# Automatically generated build file. Do not edit.' > $@
@@ -151,6 +153,7 @@ component_project_vars.mk::
 	@echo 'COMPONENT_CFLAGS += $(call MakeVariablePath,$(COMPONENT_ADD_CFLAGS))' >> $@
 	@echo 'COMPONENT_LINKER_DEPS += $(call MakeVariablePath,$(call resolvepath,$(COMPONENT_ADD_LINKER_DEPS),$(COMPONENT_PATH)))' >> $@
 	@echo 'COMPONENT_SUBMODULES += $(call MakeVariablePath,$(addprefix $(COMPONENT_PATH)/,$(COMPONENT_SUBMODULES)))' >> $@
+	@echo "$${COMPONENT_ADDITIONAL_VARS}" >> $@
 	@echo '$(COMPONENT_NAME)-build: $(addsuffix -build,$(COMPONENT_DEPENDS))' >> $@
 
 

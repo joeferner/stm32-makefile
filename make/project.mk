@@ -260,6 +260,7 @@ export CC CXX LD AR OBJCOPY OBJDUMP SIZE STM32CUBEMX
 APP_ELF:=$(BUILD_DIR_BASE)/$(PROJECT_NAME).elf
 APP_MAP:=$(APP_ELF:.elf=.map)
 APP_BIN:=$(APP_ELF:.elf=.bin)
+export APP_ELF
 
 # Include any Makefile.projbuild file letting components add
 # configuration at the project level
