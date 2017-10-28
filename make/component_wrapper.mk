@@ -38,6 +38,9 @@ COMPONENT_LIBRARY = lib$(COMPONENT_NAME).a
 # Source dirs a component has. Default to root directory of component.
 COMPONENT_SRCDIRS = .
 
+# Generated source dirs a component has. Default is none
+COMPONENT_GENERATED_SRCDIRS = 
+
 #Names of binary & text files to embed as raw content in the component library
 COMPONENT_EMBED_FILES ?=
 COMPONENT_EMBED_TXTFILES ?=
@@ -83,6 +86,10 @@ ifndef COMPONENT_OBJS
 COMPONENT_OBJS := $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.c,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.c)))
 COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.cpp,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.cpp)))
 COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_SRCDIRS),$(patsubst %.S,%.o,$(wildcard $(COMPONENT_PATH)/$(compsrcdir)/*.S)))
+# Find all generated source files in all COMPONENT_GENERATED_SRCDIRS
+COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.c,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.c)))
+COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.cpp,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.cpp)))
+COMPONENT_OBJS += $(foreach compsrcdir,$(COMPONENT_GENERATED_SRCDIRS),$(patsubst %.S,%.o,$(wildcard $(COMPONENT_BUILD_DIR)/$(compsrcdir)/*.S)))
 # Make relative by removing COMPONENT_PATH from all found object paths
 COMPONENT_OBJS := $(patsubst $(COMPONENT_PATH)/%,%,$(COMPONENT_OBJS))
 else
@@ -209,6 +216,37 @@ endef
 
 # Generate all the compile target patterns
 $(foreach srcdir,$(COMPONENT_SRCDIRS), $(eval $(call GenerateCompileTargets,$(srcdir))))
+
+# This pattern is generated for each COMPONENT_GENERATED_SRCDIRS to compile the files in it.
+define GenerateCompileGeneratedTargets
+# $(1) - directory containing source files, relative to $(COMPONENT_BUILD_DIR) - one of $(COMPONENT_GENERATED_SRCDIRS)
+#
+$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.c $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_GENERATED_SRCDIRS)
+	$$(summary) CC $$@
+	$$(CC) $$(CFLAGS) $$(CPPFLAGS) $$(addprefix -I ,$$(COMPONENT_INCLUDES)) $$(addprefix -I ,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
+
+$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.cpp $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_GENERATED_SRCDIRS)
+	$$(summary) CXX $$@
+	$$(CXX) $$(CXXFLAGS) $$(CPPFLAGS) $$(addprefix -I,$$(COMPONENT_INCLUDES)) $$(addprefix -I,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
+
+$(1)/%.o: $$(COMPONENT_BUILD_DIR)/$(1)/%.S $(COMMON_MAKEFILES) $(COMPONENT_MAKEFILE) | $(COMPONENT_GENERATED_SRCDIRS)
+	$$(summary) AS $$@
+	$$(CC) $$(CPPFLAGS) $$(DEBUG_FLAGS) $$(addprefix -I ,$$(COMPONENT_INCLUDES)) $$(addprefix -I ,$$(COMPONENT_EXTRA_INCLUDES)) -I$(1) -c $$< -o $$@
+
+# CWD is build dir, create the build subdirectory if it doesn't exist
+#
+# (NB: Each .o file depends on all relative component build dirs $(COMPONENT_GENERATED_SRCDIRS), rather than just $(1), to work
+# around a behaviour make 3.81 where the first pattern (randomly) seems to be matched rather than the best fit. ie if
+# you have objects a/y.o and a/b/c.o then c.o can be matched with $(1)=a & %=b/c, meaning that subdir 'a/b' needs to be
+# created but wouldn't be created if $(1)=a. Make 4.x doesn't have this problem, it seems to preferentially
+# choose the better match ie $(1)=a/b and %=c )
+#
+$(1):
+	mkdir -p $(1)
+endef
+
+# Generate all the compile target patterns
+$(foreach srcdir,$(COMPONENT_GENERATED_SRCDIRS), $(eval $(call GenerateCompileGeneratedTargets,$(srcdir))))
 
 ## Support for embedding binary files into the ELF as symbols
 
