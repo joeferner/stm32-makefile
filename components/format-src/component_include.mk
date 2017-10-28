@@ -1,4 +1,4 @@
-format:
+format-src:
 	astyle -n \
 		--indent=spaces=2 \
 		--style=attach \
@@ -7,5 +7,4 @@ format:
 		--align-pointer=type \
 		--align-reference=type \
 		--add-brackets \
-		main/*
-
+		$(PROJECT_PATH)/main/*

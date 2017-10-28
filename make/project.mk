@@ -22,19 +22,19 @@ all: all_binaries
 help:
 	@echo "Welcome to STM32 Makefile build system. Some useful make targets:"
 	@echo ""
-	@echo "make menuconfig - Configure STM32 project"
-	@echo "make defconfig - Set defaults for all new configuration options"
+	@echo "make menuconfig  - Configure STM32 project"
+	@echo "make defconfig   - Set defaults for all new configuration options"
 	@echo ""
-	@echo "make all - Build app"
-	@echo "make flash - Flash app to a chip"
-	@echo "make clean - Remove all build output"
-	@echo "make size - Display the memory footprint of the app"
-	@echo "make erase_flash - Erase entire flash contents"
-	@echo "make st-util - Start st-util"
-	@echo "make openocd - Start openocd"
-	@echo "make gdb - Start gdb"
-	@echo "make picocom - Start picocom"
-	@echo "make format - Format source code"
+	@echo "make all         - Build app (Default)"
+	@echo "make flash       - Flash app to a chip"
+	@echo "make clean       - Remove all build output"
+	@echo "make size        - Display the memory footprint of the app"
+	@echo "make format-src  - Format source code"
+	@echo "make erase-flash - Erase entire flash contents"
+	@echo "make st-util     - Start st-util"
+	@echo "make openocd     - Start openocd"
+	@echo "make gdb         - Start gdb"
+	@echo "make picocom     - Start picocom"
 	@echo ""
 
 # dependency checks
@@ -167,7 +167,9 @@ export COMPONENT_INCLUDES
 
 # Set variables common to both project & component
 include $(STM32_MAKEFILE_PATH)/make/common.mk
-include $(STM32_MAKEFILE_PATH)/make/size.mk
+
+COMPONENT_INCLUDES := $(addsuffix /component_include.mk,$(COMPONENT_PATHS_BUILDABLE))
+-include $(COMPONENT_INCLUDES)
 
 all:
 	@echo "To flash all build output, run 'make flash'"
