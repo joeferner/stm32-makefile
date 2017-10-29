@@ -165,7 +165,10 @@ LDFLAGS ?= \
 	$(addprefix -L$(BUILD_DIR_BASE)/,$(COMPONENTS) $(TEST_COMPONENT_NAMES) $(SRCDIRS_COMPONENT_NAMES) ) \
 	$(EXTRA_LDFLAGS) \
 	-Wl,--gc-sections \
-	$(COMPONENT_LDFLAGS)
+	-Wl,-static \
+	-Wl,--start-group \
+	$(COMPONENT_LDFLAGS) \
+	-Wl,--end-group
 
 # Set default CPPFLAGS, CFLAGS, CXXFLAGS
 # These are exported so that components can use them when compiling.
@@ -287,6 +290,7 @@ COMPONENT_LIBRARIES = $(filter $(notdir $(COMPONENT_PATHS_BUILDABLE)) $(TEST_COM
 # stored in COMPONENT_LINKER_DEPS, built via component.mk files' COMPONENT_ADD_LINKER_DEPS variable
 $(APP_ELF): $(foreach libcomp,$(COMPONENT_LIBRARIES),$(BUILD_DIR_BASE)/$(libcomp)/lib$(libcomp).a) $(COMPONENT_LINKER_DEPS)
 	$(summary) LD $(notdir $@)
+	echo $(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)s
 	$(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)
 
 $(APP_BIN): $(APP_ELF)

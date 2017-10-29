@@ -27,3 +27,8 @@ void sleep_us(uint32_t us) {
   volatile uint32_t i;
   for (i = ((SystemCoreClock / 8000000) * us); i != 0; i--) {}
 }
+
+void SysTick_Handler() {
+  HAL_IncTick();
+  HAL_SYSTICK_IRQHandler();
+}
