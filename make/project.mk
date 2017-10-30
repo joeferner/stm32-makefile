@@ -162,6 +162,7 @@ STM32_MAKEFILE_VER := $(shell cd ${STM32_MAKEFILE_PATH} && git describe --always
 # Set default LDFLAGS
 SRCDIRS_COMPONENT_NAMES := $(sort $(foreach comp,$(SRCDIRS),$(lastword $(subst /, ,$(comp)))))
 LDFLAGS ?= \
+	-lc \
 	$(addprefix -L$(BUILD_DIR_BASE)/,$(COMPONENTS) $(TEST_COMPONENT_NAMES) $(SRCDIRS_COMPONENT_NAMES) ) \
 	$(EXTRA_LDFLAGS) \
 	-Wl,--gc-sections \
@@ -290,7 +291,7 @@ COMPONENT_LIBRARIES = $(filter $(notdir $(COMPONENT_PATHS_BUILDABLE)) $(TEST_COM
 # stored in COMPONENT_LINKER_DEPS, built via component.mk files' COMPONENT_ADD_LINKER_DEPS variable
 $(APP_ELF): $(foreach libcomp,$(COMPONENT_LIBRARIES),$(BUILD_DIR_BASE)/$(libcomp)/lib$(libcomp).a) $(COMPONENT_LINKER_DEPS)
 	$(summary) LD $(notdir $@)
-	echo $(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)s
+	echo $(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)
 	$(CC) $(LDFLAGS) -o $@ -Wl,-Map=$(APP_MAP)
 
 $(APP_BIN): $(APP_ELF)
